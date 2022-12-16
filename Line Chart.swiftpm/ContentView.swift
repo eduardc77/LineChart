@@ -1,56 +1,91 @@
 import SwiftUI
 
 struct ContentView: View {
-	@State var graphData = [CGPoint(x: 0, y: 65054),
-									CGPoint(x: 1, y: 61000),
-									CGPoint(x: 2, y: 62420),
-									CGPoint(x: 3, y: 56030),
-									CGPoint(x: 4, y: 57089),
-									CGPoint(x: 5, y: 65021),
-									CGPoint(x: 6, y: 59060),
-									CGPoint(x: 7, y: 67000),
-									CGPoint(x: 8, y: 56006),
-									CGPoint(x: 9, y: 65070),
-									CGPoint(x: 10, y: 54000),
-									CGPoint(x: 11, y: 42000),
-									CGPoint(x: 12, y: 88000),
-									CGPoint(x: 13, y: 49000),
-									CGPoint(x: 14, y: 42000),
-									CGPoint(x: 15, y: 61000),
-									CGPoint(x: 16, y: 67000),
-									CGPoint(x: 17, y: 54000),
-									CGPoint(x: 18, y: 47000),
-									CGPoint(x: 19, y: 42000),
-									CGPoint(x: 20, y: 71000),
-									CGPoint(x: 21, y: 56000),
-									CGPoint(x: 22, y: 81000),
-									CGPoint(x: 23, y: 71000),
-									CGPoint(x: 24, y: 40000),
-									CGPoint(x: 25, y: 49000),
-									CGPoint(x: 26, y: 42000),
-									CGPoint(x: 27, y: 58000),
-									CGPoint(x: 28, y: 66000),
-									CGPoint(x: 29, y: 62000),
-									CGPoint(x: 30, y: 77000),
-									CGPoint(x: 31, y: 52000),
-									CGPoint(x: 32, y: 42000),
-									CGPoint(x: 33, y: 49000),
-									CGPoint(x: 34, y: 58000),
-									CGPoint(x: 35, y: 61000),
-									CGPoint(x: 36, y: 68000),
-									CGPoint(x: 37, y: 43000),
-									CGPoint(x: 38, y: 49000),
-									CGPoint(x: 39, y: 69000),
-									CGPoint(x: 40, y: 81000),
-	]
-
-	var body: some View {
-		GeometryReader { geometry in
-			Group {
-				LineChart(data: $graphData)
-					.frame(width: geometry.size.width * 0.9, height: geometry.size.height * (UIDevice.current.orientation.isLandscape ? 0.6 : 0.2))
-			}
-			.frame(maxWidth: .infinity, maxHeight: .infinity)
-		}
-	}
+    @State var chartData: [Double] = [65054, 61000, 62420, 56030, 57089, 65021, 59060, 67000, 56006, 65070, 54000, 42000, 88000, 49000, 42000, 61000, 67000, 54000, 47000, 42000, 71000, 56000, 81000, 71000, 40000, 49000, 42000, 58000, 66000, 62000, 77000, 52000, 42000, 49000, 58000, 61000, 68000, 43000, 49000, 69000, 81000]
+    
+    var body: some View {
+        GeometryReader { geometry in
+            VStack {
+                LineChart(data: LineChart.createPointMarks(with: chartData))
+                    .frame(width: geometry.size.width * 0.9, height: geometry.size.height * (UIDevice.current.orientation.isLandscape ? 0.6 : 0.2))
+                
+                
+                Button {
+                    withAnimation {
+                        chartData.append(chartData.randomElement() ?? 20000)
+                    }
+                    
+                } label: {
+                    Text("Add Value")
+                }
+                
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
 }
+
+//struct ContentView2: View {
+//    var graphData: [CGPoint] = []
+//    
+//    init() {
+//        var expensePointMarks: [CGPoint] = []
+//        for expense in Expense.allExpenses {
+//            expensePointMarks.append(CGPoint(x: Double(expense.xValue), y: expense.expense))
+//        }
+//        graphData = expensePointMarks
+//    }
+//
+//    var body: some View {
+//        GeometryReader { geometry in
+//            Group {
+//                LineChart(data: graphData)
+//                    .frame(width: geometry.size.width * 0.9, height: geometry.size.height * (UIDevice.current.orientation.isLandscape ? 0.6 : 0.2))
+//            }
+//            .frame(maxWidth: .infinity, maxHeight: .infinity)
+//        }
+//    }
+//}
+//
+//struct Expense {
+//    enum Month: Int {
+//        case jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec
+//    }
+//    
+//    let month: Month
+//    let expense: Double
+//    
+//    var quarter: Int {
+//        switch month {
+//        case .jan, .feb, .mar:
+//            return 1
+//        case .apr, .may, .jun:
+//            return 2
+//        case .jul, .aug, .sep:
+//            return 3
+//        default:
+//            return 4
+//            
+//        }
+//    }
+//    
+//    var xValue: Double {Double(month.rawValue) }
+//    
+//    static var allExpenses: [Expense] {
+//        [
+//            Expense(month: .jan, expense: 3500),
+//            Expense(month: .feb, expense: 5000),
+//            Expense(month: .mar, expense: 5500),
+//            Expense(month: .apr, expense: 5100),
+//            Expense(month: .may, expense: 4200),
+//            Expense(month: .jun, expense: 7500),
+//            Expense(month: .jul, expense: 1250),
+//            Expense(month: .aug, expense: 9000),
+//            Expense(month: .sep, expense: 5750),
+//            Expense(month: .oct, expense: 6000),
+//            Expense(month: .nov, expense: 2100),
+//            Expense(month: .dec, expense: 6000)
+//            
+//        ]
+//    }
+//}

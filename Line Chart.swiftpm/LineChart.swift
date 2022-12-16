@@ -10,38 +10,38 @@ import SwiftUI
 struct LineChart: View {
 	// MARK: - Public Properties
 	
-	@Binding var data: [CGPoint]
-	@State var showIndicator: Bool
-	var lineWidth: Double
+	var data: [CGPoint]
+	var enableIndicator: Bool
+	var lineMarkWidth: Double
 	var pointMarkSize: Double
 	var numberOfGridlines: Int
 	var axisBaseValue: Double?
 	
 	// MARK: - Private Properties
 	
-	@State private var currentYLabel: Double = 0
-	@State private var pointMarkReached: Double = 0
-	@State private var isDragging: Bool = false
-	@State private var animationProgress: CGFloat = 0
+    @State private var isDragging: Bool = false
+	@State private var currentYLabel: Double = .zero
+	@State private var pointMarkReached: Double = .zero
+	@State private var animationProgress: CGFloat = .zero
 	@State private var dragGestureXLocation: Double = .zero
-	private var hapticGenerator: UIImpactFeedbackGenerator = .init(style: .light)
+    private var selectionFeedbackGenerator: UISelectionFeedbackGenerator = .init()
 	private var lineColor: Color = .gray
 	private var yLegendOffset: CGFloat = -13
-	private var maxY: Double = 0
-	private var minY: Double = 0
-	private var maxX: Double = 0
-	private var minX: Double = 0
-	private var xAxis: Double = 0
-	private var yAxis: Double = 0
+    private var maxY: Double = .zero
+	private var minY: Double = .zero
+	private var maxX: Double = .zero
+	private var minX: Double = .zero
+	private var xAxis: Double = .zero
+	private var yAxis: Double = .zero
 	private var yLabels: [Double] { data.map { $0.y } }
 	private var xLabels: [Double] { data.map { $0.x } }
 	
 	// MARK: - Initialization
 	
-	init(data: Binding<[CGPoint]>, showIndicator: Bool = true, lineWidth: Double = 3.2, pointMarkSize: Double = 6, numberOfGridlines: Int = 4, axisBaseValue: Double? = .zero) {
-		_data = data
-		self.showIndicator = showIndicator
-		self.lineWidth = lineWidth
+	init(data: [CGPoint], enablePositionIndicator: Bool = true, lineMarkWidth: Double = 3.2, pointMarkSize: Double = 6, numberOfGridlines: Int = 4, axisBaseValue: Double? = .zero) {
+        self.data = data
+		self.enableIndicator = enablePositionIndicator
+		self.lineMarkWidth = lineMarkWidth
 		self.pointMarkSize = pointMarkSize
 		self.numberOfGridlines = numberOfGridlines
 		self.axisBaseValue = axisBaseValue
@@ -68,7 +68,7 @@ struct LineChart: View {
 						
 						lineMark(in: geometry)
 							.trim(from: 0, to: animationProgress)
-							.stroke(lineColor, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round))
+							.stroke(lineColor, style: StrokeStyle(lineWidth: lineMarkWidth, lineCap: .round, lineJoin: .round))
 							.overlay {
 								if pointMarkSize > 0 {
 									pointMarks(in: geometry)
@@ -77,7 +77,7 @@ struct LineChart: View {
 								}
 							}
 						
-						if showIndicator { positionIndicator(in: geometry) }
+						if enableIndicator { positionIndicator(in: geometry) }
 					}
 				}
 				.background {
@@ -98,6 +98,14 @@ struct LineChart: View {
 		}
 		.onAppear { withAnimation(.easeIn(duration: 2).delay(0.3)) { animationProgress = 1 } }
 	}
+    
+    static func createPointMarks(with array: [Double]) -> [CGPoint] {
+        var data: [CGPoint] = []
+        for (index, value) in array.enumerated() {
+            data.append(CGPoint(x: Double(index), y: value))
+        }
+        return data
+    }
 }
 
 // MARK: - Subviews
@@ -151,7 +159,7 @@ private extension LineChart {
 				.position(x: dragGestureXLocation, y: geometry.size.height / 2)
 			
 			Circle()
-				.frame(width: 12, height: 12)
+				.frame(width: 10, height: 10)
 				.position(x: dragGestureXLocation, y: getYPosition(forXPosition: dragGestureXLocation, in: geometry.size))
 		}
 		.opacity(isDragging ? 1 : 0)
@@ -171,8 +179,7 @@ private extension LineChart {
 				}
 		)
 		.onChange(of: pointMarkReached) { value in
-			guard let firstValue = data.first?.y, value != firstValue else { return }
-			hapticGenerator.impactOccurred()
+            selectionFeedbackGenerator.selectionChanged()
 		}
 	}
 	
@@ -194,10 +201,10 @@ private extension LineChart {
 // MARK: - Private Methods
 
 private extension LineChart {
-	// MARK: -  Position Indicator Methods
+	// Position Indicator Methods
 	
 	mutating func setupChart() {
-		if !$data.wrappedValue.isEmpty {
+		if !data.isEmpty {
 			// If axisBaseValue is not set, the minY value will be the lowest value in the data array.
 			minY = axisBaseValue == nil ? yLabels.min() ?? .zero : axisBaseValue ?? .zero
 			maxY = yLabels.max() ?? 0
@@ -218,9 +225,9 @@ private extension LineChart {
 			xAxis = maxX - minX
 			yAxis = maxY - minY
 		}
-	}
-	
-	func yLabel(forXPosition xPosition: Double, in geometrySize: CGSize) -> Double {
+    }
+    
+    func yLabel(forXPosition xPosition: Double, in geometrySize: CGSize) -> Double {
 		let xLabel = xLabel(forXPosition: xPosition, in: geometrySize)
 		var result = Double(0)
 		
@@ -234,8 +241,8 @@ private extension LineChart {
 				
 				//Set currentYLabel value for position indicator.
 				DispatchQueue.main.async {
-					if round(xLabel) == data[0].x {
-						currentYLabel = data[0].y
+                    if round(xLabel) == xLabels[0] {
+						currentYLabel = yLabels[0]
 					} else if round(xLabel) == round(data[Int(upperBound)].x) {
 						currentYLabel = data[index].y
 					}
@@ -255,7 +262,7 @@ private extension LineChart {
 		return (1 - CGFloat((yLabel - minY) / yAxis)) * geometrySize.height
 	}
 	
-	// MARK: -  Legend Methods
+	// Legend Methods
 	
 	func yLegendLabels() -> [Double]? {
 		let step = Double(maxY - minY) / Double(numberOfGridlines)
