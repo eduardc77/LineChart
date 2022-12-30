@@ -1,3 +1,10 @@
+//
+//  LineChart.swift
+//  Line Chart
+//
+//  Created by Eduard Caziuc on 11.12.2022.
+//
+
 import SwiftUI
 
 struct ContentView: View {
