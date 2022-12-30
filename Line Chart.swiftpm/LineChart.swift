@@ -161,6 +161,8 @@ private extension LineChart {
             .position(x: dragGestureXLocation, y: geometry.size.height / 2)
          
          Circle()
+				.fill(Color.white)
+				.shadow(radius: 1)
             .frame(width: 10, height: 10)
             .position(x: dragGestureXLocation, y: getYPosition(forXPosition: dragGestureXLocation, in: geometry.size))
       }
