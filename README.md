@@ -1,3 +1,3 @@
 # LineChart
 
-A simple example of a line chart.
+An example of an interactive Line Chart built using SwiftUI.
