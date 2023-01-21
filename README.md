@@ -1,6 +1,3 @@
-# LineChart
-
-
 <!-- HEADER -->
 <h1> Line Chart </h1>
 
