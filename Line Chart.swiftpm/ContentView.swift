@@ -10,10 +10,11 @@ import SwiftUI
 struct ContentView: View {
    @State var chartData: [Double] = [65054, 61000, 62420, 56030, 57089, 65021, 59060, 67000, 56006, 65070, 54000, 42000, 88000, 49000, 42000, 61000, 67000, 54000, 47000, 42000, 71000, 56000, 81000, 71000, 40000, 49000, 42000, 58000, 66000, 62000, 77000, 52000, 42000, 49000, 58000, 61000, 68000, 43000, 49000, 69000, 81000]
    @State var presentGraphSheet: Bool = false
+	@State var pointMarkSize: Double = 0
    
    var body: some View {
       GeometryReader { geometry in
-         VStack(spacing: 20) {
+			VStack(spacing: UIDevice.current.orientation.isLandscape ? 4 : 20) {
             lineGraph
                .frame(width: geometry.size.width * 0.9, height: geometry.size.height * (UIDevice.current.orientation.isLandscape ? 0.6 : 0.2))
             
@@ -23,7 +24,15 @@ struct ContentView: View {
                Text("Add Value")
             }
             .buttonStyle(.borderedProminent)
-         }
+
+				VStack {
+					Slider(value: $pointMarkSize, in: 0...10)
+					if UIDevice.current.orientation.isPortrait {
+						Text("Point Mark Size: \(Int(pointMarkSize))")
+					}
+				}
+				.padding(.horizontal)
+			}
          .frame(maxWidth: .infinity, maxHeight: .infinity)
          
          .onTapGesture {
@@ -34,7 +43,7 @@ struct ContentView: View {
    
    @ViewBuilder
    var lineGraph: some View {
-      LineChart(data: LineChart.createPointMarks(with: chartData))
+      LineChart(data: LineChart.createPointMarks(with: chartData), pointMarkSize: pointMarkSize)
    }
 }
 
