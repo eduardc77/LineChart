@@ -98,7 +98,7 @@ struct LineChart: View {
 					.stroke(.gray, lineWidth: 1)
 			}
 		}
-		.onAppear { withAnimation(.easeIn(duration: 2).delay(0.6)) { animationProgress = 1 } }
+		.onAppear { withAnimation(.easeIn(duration: 2).delay(0.3)) { animationProgress = 1 } }
 	}
 
 	static func createPointMarks(with array: [Double]) -> [CGPoint] {
